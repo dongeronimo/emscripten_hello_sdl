@@ -12,7 +12,7 @@ void UnlockSurfaceIfNeeded(const std::shared_ptr<SDL_Surface>& surface);
 void FlipSurface(const std::shared_ptr<SDL_Surface>& surface);
 
 int main(int argc, char** argv){
-    std::cout<<"Hello world"<<std::endl;
+    std::cout<<"Charles Bronson abd"<<std::endl;
     SDL_Init(SDL_INIT_VIDEO);
     std::shared_ptr<SDL_Surface> screen = CreateSurface(256, 256);
     LockSurfaceIfNeeded(screen);
