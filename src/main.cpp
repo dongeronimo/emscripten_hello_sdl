@@ -1,20 +1,39 @@
 #include <iostream>
+#include <memory>
 #include <SDL/SDL.h>
 //#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 //#endif
+//Declarations
+std::shared_ptr<SDL_Surface> CreateSurface(unsigned int width, unsigned int height);
+void LockSurfaceIfNeeded(const std::shared_ptr<SDL_Surface>& surface);
+void DrawSomething(const std::shared_ptr<SDL_Surface>& surface);
+void UnlockSurfaceIfNeeded(const std::shared_ptr<SDL_Surface>& surface);
+void FlipSurface(const std::shared_ptr<SDL_Surface>& surface);
 
-SDL_Surface *CreateSurface(unsigned int width, unsigned int height){
-    SDL_Surface  *screen = SDL_SetVideoMode(width,height, 32, SDL_SWSURFACE);
-    return screen;
+int main(int argc, char** argv){
+    std::cout<<"Hello world"<<std::endl;
+    SDL_Init(SDL_INIT_VIDEO);
+    std::shared_ptr<SDL_Surface> screen = CreateSurface(256, 256);
+    LockSurfaceIfNeeded(screen);
+    DrawSomething(screen);
+    UnlockSurfaceIfNeeded(screen);
+    FlipSurface(screen);
+    SDL_Quit();
+    return 0;
+}
+//Definitions, separated from declarations as is the Will Of God.
+std::shared_ptr<SDL_Surface> CreateSurface(unsigned int width, unsigned int height){
+    std::shared_ptr<SDL_Surface> surf(SDL_SetVideoMode(width,height, 32, SDL_SWSURFACE));
+    return surf;
 }
 
-void LockSurfaceIfNeeded(SDL_Surface* surface){
+void LockSurfaceIfNeeded(const std::shared_ptr<SDL_Surface>& surface){
     if (SDL_MUSTLOCK(surface)) {
-        SDL_LockSurface(surface);
+        SDL_LockSurface(surface.get());
     }
 }
-void DrawSomething(SDL_Surface* surface){
+void DrawSomething(const std::shared_ptr<SDL_Surface>& surface){
     for (int i = 0; i < 256; i++) {
         for (int j = 0; j < 256; j++) {
             int alpha = (i+j) % 255;
@@ -22,20 +41,12 @@ void DrawSomething(SDL_Surface* surface){
         }
     }
 }
-void UnlockSurfaceIfNeeded(SDL_Surface* surface){
+void UnlockSurfaceIfNeeded(const std::shared_ptr<SDL_Surface>& surface){
     if (SDL_MUSTLOCK(surface)) {
-        SDL_UnlockSurface(surface);
+        SDL_UnlockSurface(surface.get());
     }
 }
 
-int main(int argc, char** argv){
-    std::cout<<"Hello world"<<std::endl;
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_Surface  *screen = CreateSurface(256, 256);
-    LockSurfaceIfNeeded(screen);
-    DrawSomething(screen);
-    UnlockSurfaceIfNeeded(screen);
-    SDL_Flip(screen);
-    SDL_Quit();
-    return 0;
+void FlipSurface(const std::shared_ptr<SDL_Surface>& surface){
+    SDL_Flip(surface.get());
 }
